@@ -22,9 +22,9 @@ SELECT DISTINCT ON (cst.contract_id)
     (SELECT fo.title FROM financial_operations AS fo WHERE fo.id = c.operation_id) AS operacao_contrato,
     (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = c.financer_nature_id) AS natureza_contrato,
     (SELECT fct.title FROM financial_collection_types AS fct WHERE fct.id = c.financial_collection_type_id) AS tipo_cobranca,
-    LAST_VALUE(op.title) OVER (PARTITION BY ag.contract_id  ORDER BY ag.created ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS operacao_agrupador,
-    LAST_VALUE(fn.title) OVER (PARTITION BY ag.contract_id  ORDER BY ag.created ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS natureza_agrupador,
-    LAST_VALUE(fct.title) OVER (PARTITION BY ag.contract_id  ORDER BY ag.created ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS tipo_cobranca_agrupador,
+	 (SELECT fo2.title FROM financial_operations AS fo2 WHERE fo2.id = ag_new.financial_operation_id) AS operacao_agrupador,
+    (SELECT fn2.title FROM financers_natures AS fn2 WHERE fn2.id = ag_new.financer_nature_id) AS natureza_agrupador,
+    (SELECT fct2.title FROM financial_collection_types AS fct2 WHERE fct2.id = ag_new.financial_collection_type_id) AS tipo_cobranca_agrupador,
     ai.protocol AS protocolo,
     (SELECT it.title FROM incident_types AS it WHERE it.id = ai.incident_type_id) AS tipo_solicitacao,
     a.description AS descricao_abertura,
@@ -89,9 +89,16 @@ SELECT DISTINCT ON (cst.contract_id)
         LEFT JOIN solicitation_category_matrices AS ssc ON ssc.id = ai.solicitation_category_matrix_id
         LEFT JOIN solicitation_category_matrix_solutions AS scms ON scms.solicitation_category_matrix_id = ssc.id
         LEFT JOIN financial_receivable_titles AS frt ON frt.contract_id = c.id AND frt.title LIKE '%FAT%'
-        LEFT JOIN financial_operations AS op ON op.id = ag.financial_operation_id
-        LEFT JOIN financial_collection_types AS fct ON fct.id = ag.financial_collection_type_id
-        LEFT join financers_natures AS fn ON fn.id = ag.financer_nature_id
+        
+        LEFT JOIN LATERAL (
+    SELECT ag2.financial_operation_id,
+        ag2.financer_nature_id,
+        ag2.financial_collection_type_id
+    FROM contract_configuration_billings AS ag2 INNER JOIN contract_items AS serv ON ag2.id = serv.contract_configuration_billing_id AND serv.deleted = FALSE
+    LEFT JOIN service_products AS sp ON sp.id = serv.service_product_id
+    WHERE sp.huawei_profile_name IS NOT NULL
+      AND ag2.contract_id = c.id
+    LIMIT 1) AS ag_new ON TRUE
 
         LEFT JOIN LATERAL (
             SELECT fat2.expiration_date
@@ -105,7 +112,8 @@ SELECT DISTINCT ON (cst.contract_id)
 
 WHERE 
     ai.incident_type_id IN (1327, 2018, 2156, 2155, 2174, 2222, 2153, 2154, 2157, 2024, 2014, 2016, 1776, 1308, 1397, 1328, 1017, 1821, 1330, 2091, 2124, 2125, 1991, 1992, 1398, 1606, 1822, 2100, 2099, 2101, 1974, 1975, 1604, 1605, 52,51, 2100,1823)
-    AND DATE(a.conclusion_date) BETWEEN '$encerramento01' AND '$encerramento02'
+    AND DATE(a.conclusion_date) BETWEEN '2025-02-10' AND '2025-02-12'
     AND cet.id = 133
     AND ce.description LIKE '%Serviço Incluído%'
     AND ai.incident_status_id = 4 
+    --AND p."name" = 'JULIA TAUCHMANN PITOMBEIRA'
