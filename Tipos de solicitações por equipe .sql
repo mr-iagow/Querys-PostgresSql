@@ -12,5 +12,5 @@ FROM incident_types AS it
 LEFT JOIN service_level_agreements AS sla ON it.service_level_agreement_id = sla.id
 left JOIN service_level_agreement_types AS slat ON slat.id = sla.service_level_agreement_type_id
 
-WHERE it.team_id = 1080
+WHERE it.team_id IN ( 1068, 1079, 1007)
 AND it.active = true
