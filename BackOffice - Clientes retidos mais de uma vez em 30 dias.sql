@@ -11,7 +11,10 @@ WITH solicitacoes_retencao AS (
    LEFT JOIN solicitation_category_matrices AS ssc ON ssc.id = ai.solicitation_category_matrix_id
    LEFT JOIN solicitation_service_categories AS ss  ON ss.id = ssc.service_category_id_3 
 	JOIN people AS p ON p.id = ai.client_id 
-	JOIN v_users AS v ON v.id = a.created_by WHERE ss.title IS NOT NULL AND ai.incident_type_id = 1059
+	JOIN v_users AS v ON v.id = a.created_by 
+	WHERE ss.title IS NOT NULL 
+	AND ai.incident_type_id = 1059
+	AND a.created::date BETWEEN '$data01' AND '$data02'
   ),
   base_com_primeiro AS (
     SELECT
@@ -44,4 +47,4 @@ SELECT
   
 FROM dentro_30_dias
 WHERE total_retencao > 1
-ORDER BY cliente, data_abertura;
+ORDER BY cliente, data_abertura
