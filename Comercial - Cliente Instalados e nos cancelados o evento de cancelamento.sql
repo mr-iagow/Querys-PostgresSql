@@ -32,7 +32,12 @@ SELECT DISTINCT ON (c.id)
               AND re.rn = 2
         )
         ELSE NULL
-    END AS evento_cancelamento
+    END AS evento_cancelamento,
+    c.cancellation_date AS data_cancelamento,
+    p.phone AS telefone,
+    p.cell_phone_1 AS celular,
+    CASE 
+    	WHEN frt.p_is_receivable = TRUE THEN 'sim' ELSE 'nao' END AS possui_debito
 FROM 
     contracts AS c 
     JOIN people AS p ON p.id = c.client_id
@@ -43,6 +48,7 @@ FROM
     LEFT JOIN person_people_groups AS ppg ON ppg.person_id = c.seller_1_id
     LEFT JOIN contract_events AS ce ON ce.contract_id = c.id
     LEFT JOIN contract_event_types AS cet ON cet.id = ce.contract_event_type_id
+    LEFT JOIN financial_receivable_titles AS frt ON frt.contract_id = c.id AND frt.deleted = FALSE AND frt.p_is_receivable = TRUE
 WHERE 
     (c.v_stage IN ('Em Aprovação', 'Pré-Contrato') 
     AND c.deleted = FALSE 
