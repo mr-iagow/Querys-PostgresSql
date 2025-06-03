@@ -1,16 +1,99 @@
-SELECT DISTINCT ON (c.id)
+SELECT DISTINCT ON (c.id, cev.id)
 c.id AS id_contrato,
 p.name AS cliente,
-(SELECT cet.title FROM contract_event_types AS cet WHERE ce.contract_event_type_id = cet.id) AS evento,
-(SELECT v.name FROM v_users AS v WHERE v.id = caa.modified_by) AS aprovador,
-	cp."description" AS empresa,
+CASE
+	WHEN pu.title IS NULL THEN 'Sem Contrato De Fidelidade/Termo Adesão Vinculado' ELSE pu.title END AS termo_adesao_pessoas_completo,
+DATE (pu.created) AS data_vinculo_termo_contrato,
+CASE
+	WHEN p.taxation_regime_type = 0 THEN 'Não Definido'
+	WHEN p.taxation_regime_type = 1 THEN 'Simples Nacional'
+	WHEN p.taxation_regime_type = 2 THEN 'Normal'
+END AS reg_tributario,
+CASE
+	WHEN p.csll_deducted = 0 THEN 'Sem Retenção'
+	WHEN p.csll_deducted = 1 THEN 'Normal'
+	WHEN p.csll_deducted = 2 THEN 'Reter Sempre'
+END AS pis_cofins_csll,
+
+CASE
+	WHEN p.retains_income_tax = 0 THEN 'Sem Retenção'
+	WHEN p.retains_income_tax = 2 THEN 'Normal'
+	WHEN p.retains_income_tax = 1 THEN 'Reter Sempre'
+END AS retem_ir,
+CASE 
+	WHEN p.taxes_municipality = 1 THEN 'Sim'
+	WHEN p.taxes_municipality = 2 THEN 'Não'
+END AS tributa_no_municipio,
+CASE 
+	WHEN p.federal_organ = TRUE THEN 'Sim'
+	WHEN p.federal_organ = FALSE THEN 'Não'
+END AS orgao_federal,
+CASE 
+	WHEN p.taxes_issqn = TRUE THEN 'Sim'
+	WHEN p.taxes_issqn = FALSE THEN 'Não'
+END AS tributa_issqn,
+CASE 
+WHEN p.tax_value = TRUE THEN 'Sim'
+WHEN p.tax_value = FALSE THEN 'Não'
+WHEN p.tax_value = NULL THEN 'vazio'
+END AS retem_issqn,
+CASE 
+	WHEN p.resp_retains= TRUE THEN 'Sim'
+	WHEN p.resp_retains = FALSE THEN 'Não'
+END AS prestado_responsavel_retencao,
+p.tax_percentage AS aliquota_issqn,
+p.aliquot_irr AS aliquota_irrf,
+p.pis_aliquot AS aliquota_pis,
+p.cofins_aliquot AS aliquota_cofins,
+
+CASE 
+	WHEN p.service_provider_autonomo = TRUE THEN 'Sim'
+	WHEN p.service_provider_autonomo = FALSE THEN 'Não'
+END AS prest_serv_autonomo,
+p.crc,
+p.municipal_registration AS inscricao_municipal,
+p.state_registration AS inscricao_estadual,
+pa.city AS cidade_vinculada_contrato,
+pa.neighborhood AS bairro_vinculado_contrato,
+pa.state AS estado_vinculado_contrato,
+pa.number AS numero_vinculado_contrato,
+pa.street AS rua_vinculada_contrato,
+pa.postal_code AS cep_vinculado_contrato,
+pa.address_complement AS complemento_vinculado_contrato,
+pa.country AS pais_vinculado_contrato,
+p.email,
+(SELECT v.name FROM v_users AS v WHERE v.id = caa.modified_by) AS contrato_aprovado_por,
+CASE 
+	WHEN ce.created = '0001-01-01 00:00:00' 
+	THEN DATE(ce.date) 
+	WHEN ce.created != '0001-01-01 00:00:00' 
+	THEN DATE(ce.created) 
+END AS data_aprovacao,
+sp.title AS plano,
+CASE 
+  WHEN c.discount_use_contract = 1 THEN 'Conforme Contrato'
+  WHEN c.discount_use_contract = 0 THEN 'Conforme Tipo De Cobrança'
+  WHEN c.discount_use_contract = 2 THEN 'Não Aplica Desconto'
+END AS possui_desconto_no_contrato,
+caa.activation_date AS data_ativacao,
+cp.description AS empresa,
+c.collection_day AS dia_vcto_contrato,
+c.billing_beginning_date AS faturar_de_inicial,
+c.billing_final_date AS faturar_de_final,
+c.beginning_date AS vigencia_contrato_inicial,
+c.final_date AS vigencia_contrato_final,
 (SELECT fo.title FROM financial_operations AS fo WHERE fo.id = c.operation_id) AS operacao_contrato,
 (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = c.financer_nature_id) AS natureza_contrato,
 (SELECT fo.title FROM financial_operations AS fo WHERE fo.id = c.second_financial_operation_id) AS operacao_secundaria_contrato,
 (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = c.second_financer_nature_id) AS natureza_secundaria_contrato,
 (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = ag.financer_nature_id) AS natureza_agrupador,
-(SELECT fct.title FROM financial_collection_types AS fct WHERE fct.id = ag.financial_collection_type_id) AS tipo_cobranca_agrupador
-	
+(SELECT fct.title FROM financial_collection_types AS fct WHERE fct.id = ag.financial_collection_type_id) AS tipo_cobranca_agrupador,
+c.observation AS observacoes_contrato,
+(SELECT v.name FROM v_users AS v WHERE v.id = cev.created_by) AS usuario_criado_eventual,
+cev.total_amount AS valor_eventual,
+cev.description AS descricao_eventual,
+cev.justification AS justificativa
+
 FROM contracts AS c
 INNER JOIN people AS p ON c.client_id = p.id
 LEFT JOIN contract_items AS con ON c.id = con.contract_id
@@ -19,6 +102,11 @@ INNER JOIN contract_event_types AS cet ON cet.id = ce.contract_event_type_id
 left JOIN contract_assignment_activations AS caa ON caa.contract_id = c.id
 JOIN companies_places AS cp ON cp.id = c.company_place_id
 left JOIN contract_configuration_billings AS ag ON ag.contract_id = c.id AND ag.financial_collection_type_id IS NOT NULL AND ag.financer_nature_id IS NOT NULL AND ag.deleted = false 
+JOIN people_addresses AS pa ON pa.id = c.people_address_id
+LEFT JOIN people_uploads AS pu ON pu.people_id = p.id AND pu.documentation_type_id = 8
+JOIN contract_items AS ci ON ci.contract_id = c.id AND ci.deleted = FALSE 
+JOIN service_products AS sp ON sp.id = ci.service_product_id AND sp.huawei_profile_name IS NOT NULL
+left JOIN contract_eventual_values AS cev ON cev.contract_id = c.id AND cev.deleted = false
 
-WHERE date(ce.created) BETWEEN '2025-05-01' AND '2025-06-02'
+WHERE date(ce.created) BETWEEN '2025-05-01' AND '2025-06-03' 
 AND ce.contract_event_type_id = 3
