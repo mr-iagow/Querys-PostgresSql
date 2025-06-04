@@ -1,5 +1,9 @@
-SELECT DISTINCT ON (c.id, cev.id)
+SELECT DISTINCT ON (c.id, cev.id, frt.id,ai.protocol)
 c.id AS id_contrato,
+ai.protocol AS protocolo_instalacao,
+(SELECT it.title FROM incident_types AS it WHERE it.id = ai.incident_type_id) AS tipo_instalacao,
+LAST_VALUE(r.description) OVER (PARTITION BY a.id ORDER BY r.created ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS relato_encerramento,
+a.description AS relato_abertura,
 p.name AS cliente,
 CASE
 	WHEN pu.title IS NULL THEN 'Sem Contrato De Fidelidade/Termo Adesão Vinculado' ELSE pu.title END AS termo_adesao_pessoas_completo,
@@ -45,7 +49,6 @@ p.tax_percentage AS aliquota_issqn,
 p.aliquot_irr AS aliquota_irrf,
 p.pis_aliquot AS aliquota_pis,
 p.cofins_aliquot AS aliquota_cofins,
-
 CASE 
 	WHEN p.service_provider_autonomo = TRUE THEN 'Sim'
 	WHEN p.service_provider_autonomo = FALSE THEN 'Não'
@@ -89,7 +92,7 @@ c.final_date AS vigencia_contrato_final,
 (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = ag.financer_nature_id) AS natureza_agrupador,
 (SELECT fct.title FROM financial_collection_types AS fct WHERE fct.id = ag.financial_collection_type_id) AS tipo_cobranca_agrupador,
 c.observation AS observacoes_contrato,
-(SELECT v.name FROM v_users AS v WHERE v.id = cev.created_by) AS usuario_criado_eventual,
+(SELECT v.name FROM v_users AS v WHERE v.id = cev.created_by) AS usuario_criador_eventual,
 cev.total_amount AS valor_eventual,
 cev.description AS descricao_eventual,
 cev.justification AS justificativa
@@ -106,7 +109,11 @@ JOIN people_addresses AS pa ON pa.id = c.people_address_id
 LEFT JOIN people_uploads AS pu ON pu.people_id = p.id AND pu.documentation_type_id = 8
 JOIN contract_items AS ci ON ci.contract_id = c.id AND ci.deleted = FALSE 
 JOIN service_products AS sp ON sp.id = ci.service_product_id AND sp.huawei_profile_name IS NOT NULL
-left JOIN contract_eventual_values AS cev ON cev.contract_id = c.id AND cev.deleted = false
+left JOIN contract_eventual_values AS cev ON cev.contract_id = c.id AND cev.deleted = FALSE
+LEFT JOIN financial_receivable_titles AS frt ON frt.contract_id = c.id AND frt.financer_nature_id = 103 AND frt.title LIKE '%FAT%'
+left JOIN assignments AS a ON a.requestor_id = c.client_id
+JOIN assignment_incidents AS ai ON ai.assignment_id = a.id AND ai.incident_type_id IN (1900,2175,1899,1971,2288,1970,1901) AND ai.incident_status_id = 4
+JOIN reports AS r ON r.assignment_id = a.id
 
 WHERE date(ce.created) BETWEEN '2025-05-01' AND '2025-06-03' 
 AND ce.contract_event_type_id = 3
