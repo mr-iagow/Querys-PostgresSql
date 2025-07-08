@@ -20,7 +20,8 @@ INNER JOIN contract_items AS serv ON ag.id = serv.contract_configuration_billing
 LEFT JOIN authentication_contracts AS ac ON ac.contract_id = c.id
 LEFT JOIN service_products AS pl ON pl.id = ac.service_product_id
 
-WHERE c.v_status IN ('Normal','Demonstra╬ô├╢┬úΓö¼Γòæ╬ô├╢┬úΓö£Γòæo', 'Cortesia', 'Suspenso', 'Bloqueio Financeiro', 'Bloqueio Administrativo')
-AND v_stage = 'Aprovado'
+WHERE-- c.v_status IN ('Normal','Demonstra╬ô├╢┬úΓö¼Γòæ╬ô├╢┬úΓö£Γòæo', 'Cortesia', 'Suspenso', 'Bloqueio Financeiro', 'Bloqueio Administrativo')
+--AND v_stage = 'Aprovado'
 --AND pl.id IN (4083, 162, 161, 4080, 160, 4085, 4081, 4086, 4076, 4087, 4084, 4082, 159, 6202, 7050) planos de funcionarios
-AND c.contract_type_id IN (13,20)
+c.contract_type_id IN (13,20)
+AND c.v_status != 'Cancelado'
