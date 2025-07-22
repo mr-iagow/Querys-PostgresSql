@@ -15,4 +15,4 @@ JOIN assignment_incidents AS ai ON ai.assignment_id = a.id
 
 WHERE 
 
-ppl.assignment_id = 3456826
+ai.protocol = 3093427

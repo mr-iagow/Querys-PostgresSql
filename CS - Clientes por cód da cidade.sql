@@ -14,3 +14,4 @@ JOIN contracts AS c ON c.client_id = p.id AND c.people_address_id = pa.id
 WHERE 
 
 pa.code_city_id IN (2302909, 2307700, 2304954, 2301208, 2301950)
+AND c.v_status != 'Cancelado'

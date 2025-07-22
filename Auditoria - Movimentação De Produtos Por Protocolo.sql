@@ -1,5 +1,4 @@
 SELECT 
-a.id,
 ai.protocol AS protocolo,
 inv.document_number AS numero_nf_movimentacao,
 sp.title AS produto,
@@ -16,4 +15,4 @@ JOIN invoice_notes AS inv ON inv.id = v.invoice_note_id
 JOIN v_users AS vu ON vu.id = inv.created_by
 
 WHERE 
-ai.protocol = 3093427 
+ai.protocol = 3093427
