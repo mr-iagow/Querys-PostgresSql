@@ -44,6 +44,7 @@ CASE
 	WHEN ce.created != '0001-01-01 00:00:00' 
 	THEN DATE(ce.created) 
 END AS data_aprovacao,
+DATE (a.conclusion_date) AS data_encerramento_ativacao,
 sp.title AS plano,
 CASE 
   WHEN c.discount_use_contract = 1 THEN 'Conforme Contrato'
@@ -63,7 +64,7 @@ c.final_date AS vigencia_contrato_final,
 (SELECT fo.title FROM financial_operations AS fo WHERE fo.id = c.second_financial_operation_id) AS operacao_secundaria_contrato,
 (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = ag.financer_nature_id) AS natureza_agrupador,
 (SELECT fct.title FROM financial_collection_types AS fct WHERE fct.id = ag.financial_collection_type_id) AS tipo_cobranca_agrupador,
-(SELECT fo.title FROM financial_operations AS fo WHERE fo.id = ag.financial_operation_id) AS teste_operacao,
+(SELECT fo.title FROM financial_operations AS fo WHERE fo.id = ag.financial_operation_id) AS operacao_agrupador,
 c.observation AS observacoes_contrato,
 (SELECT v.name FROM v_users AS v WHERE v.id = cev.created_by) AS usuario_criador_eventual,
 cev.total_amount AS valor_eventual,
@@ -89,6 +90,5 @@ JOIN assignment_incidents AS ai ON ai.assignment_id = a.id AND ai.incident_type_
 JOIN reports AS r ON r.assignment_id = a.id
 JOIN contract_types AS cty ON cty.id = c.contract_type_id
 
-WHERE date(ce.created) BETWEEN '2025-07-01' AND '2025-07-29' -- Data de aprovação dos contratos no ERP VOALLE
+WHERE date(ce.created) BETWEEN '2025-07-01' AND '2025-07-15' -- Data de aprovação dos contratos no ERP VOALLE
 AND ce.contract_event_type_id = 3
---AND c.id = 122190 -- Evento de aprovacao do ERP VOALLE
