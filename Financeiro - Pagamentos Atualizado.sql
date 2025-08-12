@@ -25,4 +25,4 @@ FROM financial_paid_titles AS cpa
 INNER JOIN financial_payable_titles AS fpt ON fpt.id = cpa.financial_payable_title_id
 left JOIN financial_cost_center_performed_view AS cc ON cc.payable_title_id = fpt.id
 
-WHERE cpa.payment_date BETWEEN '2024-06-01' AND '2024-06-30'
+WHERE cpa.payment_date BETWEEN '2024-07-01' AND '2024-07-31'

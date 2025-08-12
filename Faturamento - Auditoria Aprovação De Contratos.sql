@@ -46,6 +46,7 @@ CASE
 END AS data_aprovacao,
 DATE (a.conclusion_date) AS data_encerramento_ativacao,
 sp.title AS plano,
+sp.selling_price AS valor_plano,
 CASE 
   WHEN c.discount_use_contract = 1 THEN 'Conforme Contrato'
   WHEN c.discount_use_contract = 0 THEN 'Conforme Tipo De Cobrança'
