@@ -17,7 +17,7 @@ LEFT JOIN contract_event_types AS cet ON cet.id = ce.contract_event_type_id
 
 WHERE 
 
-DATE (ce.created) BETWEEN '2024-10-01' AND '2024-11-18'
+DATE (ce.created) BETWEEN '2024-03-29' AND '2025-04-15'
 and ct.company_place_id NOT IN (3,11,12)
 AND ct.v_status = 'Suspenso'
 AND cet.id IN (207, 209, 210, 211, 212, 215, 216, 217, 219, 220, 221, 222, 223, 224, 231, 254, 255, 256, 257, 258, 259, 206, 208, 218, 253)

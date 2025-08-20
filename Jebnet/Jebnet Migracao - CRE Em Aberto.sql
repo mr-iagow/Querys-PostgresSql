@@ -1,6 +1,7 @@
 SELECT --DISTINCT ON (frt.id)
 
 ba."description" AS banco,
+(SELECT cp.description FROM companies_places AS cp WHERE cp.id = frt.company_place_id) AS LOCAL,
 p."name" AS cliente,
 tt."name" AS tipo_cliente,
 frt.competence AS competencia,
@@ -15,10 +16,14 @@ frt.issue_date AS emissao,
 fo_titulo.title AS operacao_financeira,
 fn.title AS natureza_financeira,
 frt.origin AS origem,
+frt.complement AS complemento,
 frtt.amount AS recebimento,
 fct.title AS tipo_cobranca,
 frt.title AS titulo,
+frt.typeful_line AS linha_digitavel,
+frt.bank_title_number AS nn_titulo,
 frt.title_amount AS valor_titulo
+
 
 
 FROM financial_receivable_titles AS frt
@@ -35,3 +40,4 @@ WHERE
 
 frt.financial_collection_type_id IN (137,136,135,134,133,132,131)
 AND frt.title LIKE '%FAT%'
+--AND p."name" = 'ADRIANO LOPES DE SOUSA'
