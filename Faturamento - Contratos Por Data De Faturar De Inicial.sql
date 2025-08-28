@@ -9,4 +9,4 @@ ct.v_status AS status_contrato
 
 FROM contracts AS ct
 
-WHERE DATE (ct.billing_beginning_date) >= '2025-09-01'
+WHERE DATE (ct.billing_beginning_date) >= '2025-10-01'
