@@ -41,7 +41,8 @@ FROM authentication_contracts AS ac
 JOIN authentication_address_lists AS adl ON adl.id = ac.authentication_address_list_id
 JOIN authentication_concentrators AS act ON act.id = ac.authentication_concentrator_id
 JOIN authentication_access_points AS acp ON acp.id = ac.authentication_access_point_id 
+LEFT JOIN contracts AS c ON c.id = ac.contract_id
 
 WHERE 
 
-ac.user = 'franciscoiagoo'
+c.contract_type_id IN (24,25,26)

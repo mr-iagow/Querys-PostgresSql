@@ -1,5 +1,6 @@
 SELECT DISTINCT ON (fatr.id)
 tt.name AS tipo_cliente,
+fat.origin,
 COALESCE(notas.client_name, pe.name) AS nome,
 COALESCE(notas.client_neighborhood, pe.neighborhood) AS bairro,
 COALESCE(notas.client_city, pe.city) AS cidade,
@@ -42,14 +43,15 @@ LEFT JOIN financial_operations AS fo_contrato ON fo_contrato.id = c.operation_id
 LEFT JOIN financial_operations AS fo_titulo ON fo_titulo.id = fat.financial_operation_id
 LEFT JOIN bank_accounts AS bacc ON fatr.bank_account_id = bacc.id
 
-WHERE fatr.receipt_date BETWEEN '2025-07-01' AND '2025-07-31'
+WHERE fatr.receipt_date BETWEEN '2025-09-01' AND '2025-09-03'
 AND fatr.deleted = FALSE
 AND ( 
 		fat.title LIKE '%FAT%' 
 		OR 
-		(fat.origin IN (1, 3, 4, 7, 11) AND fatr.receipt_origin_id IS NULL)
+		(fat.origin IN (1, 3, 4, 7, 11, 44) AND fatr.receipt_origin_id IS NULL)
 	)
+
 
 GROUP BY fatr.id,tipo_cliente, nome, bairro, cidade, fatura, natureza_financeira, vencimento, competencia, baixado, 
 data_recebimento, valor_original, multa, juros, tarifa_bancaria, tarifa_bancaria_finee, desconto, usuario_responsavel, local_fatura,
-forma_pagamento, operacao_contrato, valor_contrato, local_recebimento, operacao_titulo, conta_liquidacao
+forma_pagamento, operacao_contrato, valor_contrato, local_recebimento, operacao_titulo, conta_liquidacao,fat.origin
