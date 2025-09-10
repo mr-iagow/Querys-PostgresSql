@@ -18,5 +18,4 @@ LEFT JOIN solicitation_category_matrix_incident_types AS scmi ON scmi.solicitati
 WHERE 
 ssc.active = TRUE
 AND ssc.deleted = FALSE
---AND ssc.service_category_id_1 = 228
 
