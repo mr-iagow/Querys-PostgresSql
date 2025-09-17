@@ -12,7 +12,7 @@ date(a.conclusion_date) AS data_encerramento,
 (SELECT ss.title from solicitation_service_categories AS ss WHERE ss.id = ssc.service_category_id_3) AS cat_3,
 (SELECT ss.title from solicitation_service_categories AS ss WHERE ss.id = ssc.service_category_id_4) AS cat_4,
 (SELECT ss.title from solicitation_service_categories AS ss WHERE ss.id = ssc.service_category_id_5) AS cat_5,
-(SELECT ss.title FROM solicitation_solutions AS ss WHERE ss.id = scms.solicitation_solution_id) AS solucao
+(SELECT ss.title FROM solicitation_solutions AS ss WHERE ss.id = ai.solicitation_solution_id) AS solucao
 
 
 FROM assignments AS a 
@@ -23,6 +23,8 @@ LEFT join solicitation_category_matrices AS ssc ON ssc.id = ai.solicitation_cate
 LEFT JOIN solicitation_category_matrix_solutions AS scms ON scms.solicitation_category_matrix_id = ssc.id
 
 WHERE 
-DATE (a.created) BETWEEN '2024-05-01' AND '2024-05-31'
-AND ai.incident_type_id = 1787
+DATE (a.conclusion_date) BETWEEN '2025-09-01' AND '2025-09-15'
+AND ai.team_id = 1003
 AND ai.incident_status_id = 4
+
+--ai.protocol = 3171356 
