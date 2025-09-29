@@ -12,13 +12,13 @@ SELECT DISTINCT ON (ct.contract_number)
   p.cell_phone_2 AS celular2,
   p.phone AS telefone,
   ct.amount AS valor_contrato,
-  COALESCE(pag.qtd_boletos_pagos, 0) AS qtd_boletos_pagos
+  COALESCE(contr.qtd_boletos_pagos, 0) AS qtd_boletos_pagos
 FROM contracts AS ct
 JOIN people AS p ON p.id = ct.client_id 
 LEFT JOIN people_addresses AS pa ON pa.id = ct.people_address_id
 LEFT JOIN contract_assignment_activations AS caa ON caa.contract_id = ct.id
 
--- evento de cancelamento (mais recente que contenha "can")
+-- evento de cancelamento (mais recente que contenha "can" de cancelado)
 LEFT JOIN LATERAL (
   SELECT cet.title
   FROM contract_events ce2
@@ -34,12 +34,18 @@ LEFT JOIN (
   SELECT
     frt.contract_id,
     COUNT(*) FILTER (WHERE frtt.receipt_date IS NOT NULL) AS qtd_boletos_pagos
-  FROM financial_receivable_titles frt
-  LEFT JOIN financial_receipt_titles frtt
-    ON frtt.financial_receivable_title_id = frt.id AND frt.title LIKE '%FAT%'
+  FROM financial_receivable_titles AS frt
+  JOIN financial_receipt_titles AS frtt ON frtt.financial_receivable_title_id = frt.id
+  JOIN contracts AS ct ON ct.id = frt.contract_id
+  JOIN contract_service_tags AS ctag ON ctag.id = ct.id
+  JOIN people AS ppp ON ppp.id = frt.client_id
+  WHERE frt.title LIKE '%FAT%'
+    AND frt.finished = FALSE
+    AND frt.deleted = FALSE
   GROUP BY frt.contract_id
-) AS pag
-  ON pag.contract_id = ct.id
+) AS contr
+  ON contr.contract_id = ct.id
 
-WHERE pa.code_city_id IN (2303956, 2309607)
-ORDER BY ct.contract_number, ct.cancellation_date DESC NULLS LAST;
+
+WHERE pa.code_city_id = 2610004 AND p."name" NOT LIKE '%Teste%' AND p."name" NOT LIKE '%TESTE%' 
+ORDER BY ct.contract_number, ct.cancellation_date DESC NULLS LAST ;

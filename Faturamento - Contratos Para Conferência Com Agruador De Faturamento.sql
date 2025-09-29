@@ -24,6 +24,6 @@ INNER JOIN contract_items AS serv ON ag.id = serv.contract_configuration_billing
 LEFT JOIN authentication_contracts AS ac ON ac.contract_id = c.id
 JOIN people_addresses AS pa ON pa.id = c.people_address_id
 
-WHERE 
-c.contract_type_id IN (24,25,26,27)
-AND p.type_tx_id = 1
+
+WHERE c.v_status IN ('Normal','Demonstração', 'Cortesia', 'Suspenso', 'Bloqueio Financeiro', 'Bloqueio Administrativo') AND v_stage = 'Aprovado' AND c.deleted = FALSE 
+AND c.company_place_id = 1
