@@ -48,7 +48,7 @@ LEFT JOIN contracts AS c ON c.id = notas.contract_id
 LEFT JOIN financial_receivable_titles AS fat ON fat.invoice_note_id = notas.id
 LEFT JOIN sale_request_parcels AS srp ON srp.sale_request_id = notas.sale_request_id
 
-WHERE date(notas.out_date) BETWEEN '2025-07-01' AND '2025-07-31'
+WHERE date(notas.out_date) BETWEEN '2025-08-01' AND '2025-08-31'
 AND notas.financial_operation_id IN (1,15,25,26,34,46,63,65)
 AND notas.status NOT IN (4,5)
 AND notas.id NOT IN (975130 /*, 967966*/)
