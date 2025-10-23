@@ -1,6 +1,5 @@
 SELECT DISTINCT ON (fatr.id)
 tt.name AS tipo_cliente,
-fat.origin,
 COALESCE(notas.client_name, pe.name) AS nome,
 COALESCE(notas.client_neighborhood, pe.neighborhood) AS bairro,
 COALESCE(notas.client_city, pe.city) AS cidade,
@@ -19,6 +18,8 @@ fin.amount AS tarifa_bancaria_finee,
 fatr.credit_card_tax AS taxa_cartao,
 fatr.receipt_date AS data_recebimento,
 vu.name AS usuario_responsavel,
+ct.title AS tipo_contrato,
+fccc.title AS tipo_cobranca_contrato,
 comp_fat.description AS local_fatura,
 comp_rec.description AS local_recebimento,
 pf.title AS forma_pagamento,
@@ -31,6 +32,8 @@ FROM financial_receivable_titles AS fat
 INNER JOIN financial_receipt_titles AS fatr ON fat.id = fatr.financial_receivable_title_id
 LEFT JOIN financial_integrations_fees AS fin ON fin.financial_receivable_title_id = fat.id
 LEFT JOIN contracts AS c ON c.id = fat.contract_id
+LEFT JOIN contract_types AS ct ON ct.id = c.contract_type_id
+LEFT JOIN financial_collection_types AS fccc ON fccc.id = c.financial_collection_type_id 
 LEFT JOIN invoice_notes AS notas ON notas.id = fat.invoice_note_id
 LEFT JOIN people AS pe ON pe.id = fat.client_id
 LEFT JOIN tx_types AS tt ON tt.id = pe.type_tx_id
@@ -43,7 +46,7 @@ LEFT JOIN financial_operations AS fo_contrato ON fo_contrato.id = c.operation_id
 LEFT JOIN financial_operations AS fo_titulo ON fo_titulo.id = fat.financial_operation_id
 LEFT JOIN bank_accounts AS bacc ON fatr.bank_account_id = bacc.id
 
-WHERE fatr.receipt_date BETWEEN '2025-08-01' AND '2025-08-31'
+WHERE fatr.receipt_date BETWEEN '2025-09-01' AND '2025-09-30'
 AND fatr.deleted = FALSE
 AND ( 
 		fat.title LIKE '%FAT%' 
@@ -54,4 +57,4 @@ AND (
 
 GROUP BY fatr.id,tipo_cliente, nome, bairro, cidade, fatura, natureza_financeira, vencimento, competencia, baixado, 
 data_recebimento, valor_original, multa, juros, tarifa_bancaria, tarifa_bancaria_finee, desconto, usuario_responsavel, local_fatura,
-forma_pagamento, operacao_contrato, valor_contrato, local_recebimento, operacao_titulo, conta_liquidacao,fat.origin
+forma_pagamento, operacao_contrato, valor_contrato, local_recebimento, operacao_titulo, conta_liquidacao,fat.origin,ct.title,fccc.title
