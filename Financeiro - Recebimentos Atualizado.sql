@@ -26,7 +26,8 @@ pf.title AS forma_pagamento,
 fo_contrato.title AS operacao_contrato,
 fo_titulo.title AS operacao_titulo,
 c.amount AS valor_contrato,
-bacc.description AS conta_liquidacao
+bacc.description AS conta_liquidacao,
+fatr.complement AS complemento
 
 FROM financial_receivable_titles AS fat
 INNER JOIN financial_receipt_titles AS fatr ON fat.id = fatr.financial_receivable_title_id
@@ -46,7 +47,7 @@ LEFT JOIN financial_operations AS fo_contrato ON fo_contrato.id = c.operation_id
 LEFT JOIN financial_operations AS fo_titulo ON fo_titulo.id = fat.financial_operation_id
 LEFT JOIN bank_accounts AS bacc ON fatr.bank_account_id = bacc.id
 
-WHERE fatr.receipt_date BETWEEN '2025-09-01' AND '2025-09-30'
+WHERE fatr.receipt_date BETWEEN '2025-11-01' AND '2025-11-03'
 AND fatr.deleted = FALSE
 AND ( 
 		fat.title LIKE '%FAT%' 

@@ -22,8 +22,9 @@ LEFT JOIN contracts AS cont ON n.contract_id = cont.id
 LEFT JOIN people_addresses AS edr ON cont.people_address_id = edr.id
 INNER JOIN invoice_note_items AS ini ON ini.invoice_note_id = n.id
 WHERE 
-	n.movement_date BETWEEN '2025-09-01' AND '2025-09-30'
+	n.movement_date BETWEEN '2025-10-01' AND '2025-10-31'
 	AND n.status = 1
 	AND n.company_place_id IN (10,9,3,7,2,4,12)
-	AND n.invoice_serie_id IN (1,104,108,113,126,127,128,170,171,175,183)
+   AND n.invoice_serie_id IN (1,104,108,113,126,127,128,170,171,175,183,208,210,200,202,204,207,209,206,199,201,205,203)
+
 	--AND n.invoice_serie_id IN (1,104,108,113,126,127,128,171,170,175,183,198

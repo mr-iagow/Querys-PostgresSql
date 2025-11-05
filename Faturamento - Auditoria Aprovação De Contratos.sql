@@ -33,6 +33,12 @@ CASE
 	WHEN p.resp_retains = FALSE THEN 'Não'
 END AS prestado_responsavel_retencao,
 p.tax_percentage AS aliquota_issqn,
+CASE 
+WHEN p.state_registration_type = 2 THEN 'Isento'
+WHEN p.state_registration_type = 1 THEN 'Contribuinte'
+WHEN p.state_registration_type = 9 THEN 'Nao Contribuinte'
+END AS tipo_insc_estadual,
+p.state_registration AS insc_estadual,
 pa.city AS cidade_vinculada_contrato,
 pa.neighborhood AS bairro_vinculado_contrato,
 p.email,
@@ -91,5 +97,5 @@ JOIN assignment_incidents AS ai ON ai.assignment_id = a.id AND ai.incident_type_
 JOIN reports AS r ON r.assignment_id = a.id
 JOIN contract_types AS cty ON cty.id = c.contract_type_id
 
-WHERE date(ce.created) BETWEEN '2025-07-01' AND '2025-07-15' -- Data de aprovação dos contratos no ERP VOALLE
-AND ce.contract_event_type_id = 3
+WHERE date(ce.created) BETWEEN '2025-11-04' AND '2025-11-04' -- Data de aprovação dos contratos no ERP VOALLE
+AND ce.contract_event_type_id = 3 -- Evento de aprovacao do ERP VOALLE";
