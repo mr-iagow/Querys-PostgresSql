@@ -1,6 +1,5 @@
 SELECT DISTINCT ON (notas.id)
-date(notas.out_date) AS emissao,
-notas.document_number,
+date(notas.issue_date) AS emissao,
 p.id AS cod_pessoa,
 notas.client_name AS cliente,
 (SELECT tx.name FROM tx_types AS tx WHERE p.type_tx_id = tx.id) AS tipo_cliente,
@@ -54,8 +53,8 @@ LEFT JOIN financial_receivable_titles AS fat ON fat.invoice_note_id = notas.id
 LEFT JOIN sale_request_parcels AS srp ON srp.sale_request_id = notas.sale_request_id
 LEFT JOIN companies_places AS cp ON cp.id = notas.company_place_id
 
-WHERE date(notas.issue_date) BETWEEN '2025-09-01' AND '2025-09-30' -- Alterado de out_date para issue_date por conta do faturamento antecipado da LB Jebnet
-AND notas.financial_operation_id IN (1,15,25,26,34,46,63,65)
+WHERE date(notas.issue_date) BETWEEN '2025-10-01' AND '2025-10-31' -- Alterado de out_date para issue_date por conta do faturamento antecipado da LB Jebnet
+AND notas.financial_operation_id IN (1,15,25,26,34,46,63,65,104)
 AND notas.status NOT IN (4,5)
 AND notas.id NOT IN (975130 /*, 967966*/)
 AND notas.document_number IS NOT NULL 

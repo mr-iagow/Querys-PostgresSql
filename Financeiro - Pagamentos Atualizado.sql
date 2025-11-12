@@ -28,4 +28,4 @@ left JOIN financial_cost_center_performed_view AS cc ON cc.payable_title_id = fp
 
 WHERE 
 
-DATE (cpa.payment_date) BETWEEN '2025-09-01' AND '2025-09-30'
+DATE (cpa.payment_date) BETWEEN '2025-10-01' AND '2025-10-31'
