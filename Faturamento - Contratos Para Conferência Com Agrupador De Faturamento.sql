@@ -10,10 +10,11 @@ c.amount AS valor_contrato,
 c.v_status AS status_contrato,
 (SELECT ct.title FROM contract_types AS ct WHERE ct.id = c.contract_type_id) AS tipo_contrato,
 (SELECT fo.title FROM financial_operations AS fo WHERE fo.id = c.operation_id) AS operacao_contrato,
-(SELECT fn.title FROM financers_natures AS fn WHERE fn.id = c.financer_nature_id) AS nautreza_contrato,
+(SELECT fn.title FROM financers_natures AS fn WHERE fn.id = c.financer_nature_id) AS natureza_contrato,
 (SELECT fct.title FROM financial_collection_types AS fct WHERE fct.id = c.financial_collection_type_id) AS tipo_cobranca,
 (SELECT op.title FROM financial_operations AS op WHERE op.id = ag.financial_operation_id) AS operacao_agrupador,
 (SELECT fn.title FROM financers_natures AS fn WHERE fn.id = ag.financer_nature_id) AS nautreza_agrupador,
+(SELECT fn3.title FROM financial_collection_types AS fn3 WHERE fn3.id = ag.financial_collection_type_id) AS tipo_cobranca_agrupador,
 (SELECT serv.title FROM service_products AS serv WHERE serv.id = ac.service_product_id) AS plano_conexao,
 serv.description AS descricao_item
 
