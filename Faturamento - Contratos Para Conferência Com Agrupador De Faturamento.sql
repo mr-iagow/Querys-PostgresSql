@@ -27,4 +27,4 @@ JOIN people_addresses AS pa ON pa.id = c.people_address_id
 
 
 WHERE c.v_status IN ('Normal','Demonstração', 'Cortesia', 'Suspenso', 'Bloqueio Financeiro', 'Bloqueio Administrativo') AND v_stage = 'Aprovado' AND c.deleted = FALSE 
-AND c.company_place_id = 1
+AND c.company_place_id = 6
