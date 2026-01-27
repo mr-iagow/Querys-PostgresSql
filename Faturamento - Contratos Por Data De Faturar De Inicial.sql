@@ -3,6 +3,7 @@ SELECT
 ct.contract_number AS numero_contrato,
 (SELECT p.name FROM people AS p WHERE p.id = ct.client_id) AS cliente,
 ct.billing_beginning_date AS data_inicio_faturamento,
+ct.collection_day AS dia_vencimento_contrato,
 (SELECT ctt.title FROM contract_types AS ctt WHERE ctt.id = ct.contract_type_id) AS tipo_contrato,
 cp."description" AS empresa,
 ct.approval_date AS data_aprovacao,
