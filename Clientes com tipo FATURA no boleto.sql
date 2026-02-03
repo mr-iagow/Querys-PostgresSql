@@ -19,5 +19,5 @@ WHERE
 		frt.p_is_receivable = TRUE 
 		AND frt.origin = 7
 		AND frt.financial_collection_type_id IN (81,46,47,48,49,50,51,52,68,70,97,129)
-		AND DATE (frt.expiration_date) <= '2025-12-31'
+		AND DATE (frt.expiration_date) <= '2026-01-31'
 
