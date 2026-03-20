@@ -15,6 +15,6 @@ JOIN companies_places AS cp ON cp.id = frtt.company_place_id
 WHERE 
 frt.title LIKE '%FAT%'
 AND frto.financial_title_occurrence_type_id = 26
-AND DATE (frto.created) = '2025-08-15'
+AND DATE (frto.created) = '2026-03-19'
 AND frtt.payment_form_id IN (13,15)
 --AND p.id != 41195 removido cliente que teve o recebimento excluido e após feito manualmente

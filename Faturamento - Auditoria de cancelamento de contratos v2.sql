@@ -24,9 +24,12 @@ WITH cancelamentos AS (
         (SELECT ss.title FROM solicitation_service_categories ss WHERE ss.id = ssc.service_category_id_5) AS cat_5_cancelamento,
 		  LAST_VALUE(cet.title) OVER (PARTITION BY c.id ORDER BY ce.created ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS evento_cancelamento,
 		  (SELECT ce_bloq.created FROM contract_events ce_bloq JOIN contract_event_types cett_bloq ON ce_bloq.contract_event_type_id = cett_bloq.id
-		   WHERE cett_bloq.title LIKE '%Bloqueio Financeiro%' AND ce_bloq.contract_id = c.id ORDER BY ce_bloq.created DESC LIMIT 1) AS ultimo_evento_bloqueio,
+		   WHERE cett_bloq.title LIKE '%Bloqueio Financeiro%' AND ce_bloq.contract_id = c.id ORDER BY ce_bloq.created DESC LIMIT 1) AS ultimo_evento_bloqueio,	   
 			(SELECT ce_bloq.created FROM contract_events ce_bloq JOIN contract_event_types cett_bloq ON ce_bloq.contract_event_type_id = cett_bloq.id
 			WHERE cett_bloq.title LIKE '%Desbloqueio Financeiro%' AND ce_bloq.contract_id = c.id ORDER BY ce_bloq.created DESC LIMIT 1) AS ultimo_evento_desbloqueio,
+			serv.description AS possui_servico_repetidor_ainda_vinculado,			
+			(SELECT ce_bloq.created FROM contract_events ce_bloq JOIN contract_event_types cett_bloq ON ce_bloq.contract_event_type_id = cett_bloq.id
+			WHERE cett_bloq.title LIKE '%Exclusão de Serviços%' AND  ce_bloq.contract_id = c.id AND ce_bloq.description LIKE '%REPETIDOR%' ORDER BY ce_bloq.created DESC LIMIT 1) AS exclusao_ultra_repetidor,			
 			a.created AS data_abertura,
 			a.conclusion_date AS data_encerramento
 			FROM assignments a
@@ -36,9 +39,14 @@ WITH cancelamentos AS (
 			LEFT JOIN solicitation_category_matrices ssc ON ssc.id = ai.solicitation_category_matrix_id
 			LEFT JOIN contract_events ce ON ce.contract_id = c.id
 			JOIN contract_event_types cet ON cet.id = ce.contract_event_type_id
+			
+			LEFT JOIN contract_configuration_billings AS ag ON ag.contract_id = c.id
+			LEFT JOIN contract_items AS serv ON ag.id = serv.contract_configuration_billing_id AND serv.deleted = FALSE AND serv.service_product_id IN (6366, 9664, 9665, 6367, 7729, 8940, 5527, 3801, 5526, 7553, 3592, 3802, 5525, 6170, 8942, 2761, 6199, 6200, 9666, 5528, 6169, 2762, 7555, 7696, 8941, 7341, 3591, 7554)
+			
+			
 			WHERE 
-			    ai.incident_type_id IN (1442,1984)
-			    AND DATE(a.conclusion_date) BETWEEN '2025-03-11' AND '2025-03-11'
+			    ai.incident_type_id IN (1442,1984,2316)
+			    AND DATE(a.conclusion_date) BETWEEN '$encerramento01' AND '$encerramento02'
 			    AND ai.incident_status_id = 4
 			    AND cet.title LIKE '%Cancelamento%'
                 ),
@@ -54,7 +62,7 @@ WITH cancelamentos AS (
                     LEFT JOIN financial_receipt_titles fatr ON fat.id = fatr.financial_receivable_title_id AND fatr.deleted = FALSE AND (fat.title LIKE '%FAT%' OR (fat.origin IN (1,3,4,7,11) AND fatr.receipt_origin_id IS NULL))
                     WHERE 
                         ai.incident_type_id IN (1442,1984)
-                        AND DATE(a.conclusion_date) BETWEEN '2025-03-11' AND '2025-03-11'
+                        AND DATE(a.conclusion_date) BETWEEN '$encerramento01' AND '$encerramento02'
                         AND ai.incident_status_id = 4
                     GROUP BY 
                         cst.contract_id
@@ -71,11 +79,40 @@ WITH cancelamentos AS (
                         JOIN contracts c  ON c.id = cst.contract_id
                         WHERE 
                             ai.incident_type_id IN (1569, 2093)
-                            AND DATE(a.created) BETWEEN '2025-03-11' AND '2025-03-11'
+                            AND DATE(a.created) BETWEEN '$encerramento01' AND '$encerramento02'
                             --AND ai.incident_status_id = 4
-)
+							),solicitacao_ultra_repetidor AS (
+                        SELECT 
+                            cst.contract_id,
+                            a.created AS created_outro,
+                            (SELECT it.title FROM incident_types it WHERE it.id = ai.incident_type_id) AS solicitacao_desautenticar,
+                            ai.protocol AS possui_solicitacao_retirada_ultra_repetidor
+                        FROM assignments a
+                        JOIN assignment_incidents ai ON ai.assignment_id = a.id
+                        LEFT JOIN contract_service_tags cst ON cst.id = ai.contract_service_tag_id
+                        JOIN contracts c  ON c.id = cst.contract_id
+                        WHERE 
+                            ai.incident_type_id IN (2171,1572)
+                            --AND DATE(a.created) BETWEEN '2026-03-16' AND '2026-03-16'
+                            --AND ai.incident_status_id = 4
+							),faturas_cancelamentos AS (
+							SELECT 
+									frt.id,
+									frt.contract_id,
+									frt.title AS fatura,
+									frt.document_amount AS valor_fatura
+									
+									FROM financial_receivable_titles AS frt
+									JOIN contracts AS ccc ON ccc.id = frt.contract_id
+									WHERE frt.contract_id = ccc.id
+									AND frt.title LIKE '%FAT%'
+									
+									AND DATE (frt.created) BETWEEN '$encerramento01' AND '$encerramento02'
+							
+			)
+							
 
-SELECT DISTINCT ON (c.contract_id)
+SELECT DISTINCT ON (c.contract_id,fatc.id)
        c.contract_id,
        c.protocolo,
        c.cliente,
@@ -97,14 +134,24 @@ SELECT DISTINCT ON (c.contract_id)
        c.evento_cancelamento,
        c.ultimo_evento_bloqueio,
        c.ultimo_evento_desbloqueio,
+       c.possui_servico_repetidor_ainda_vinculado,
+       c.exclusao_ultra_repetidor,
        c.data_abertura,
        c.data_encerramento,
        o.solicitacao_desautenticar,
-       o.protocolo_desautenticar
+       o.protocolo_desautenticar,
+       sur.possui_solicitacao_retirada_ultra_repetidor,
+       fatc.fatura,
+       fatc.valor_fatura
+       
 
 FROM cancelamentos c
 LEFT JOIN faturas f ON f.contract_id = c.contract_id
 LEFT JOIN outras_solicitacoes o ON o.contract_id = c.contract_id AND o.created_outro >= c.created_cancelamento
+LEFT JOIN solicitacao_ultra_repetidor sur ON sur.contract_id = c.contract_id AND sur.created_outro >= c.created_cancelamento
+LEFT JOIN faturas_cancelamentos AS fatc ON fatc.contract_id = c.contract_id
+
 ORDER BY 
-    c.contract_id, 
+    c.contract_id,
+    fatc.id,                      
     c.created_cancelamento DESC;
