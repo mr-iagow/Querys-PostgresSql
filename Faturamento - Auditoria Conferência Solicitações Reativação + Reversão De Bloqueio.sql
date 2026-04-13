@@ -23,7 +23,7 @@ c.amount AS valor_contrato,
 cet_filtrado.title AS tipo_evento,
 CASE 
 	WHEN cet_filtrado.id IN ( 10, 106 )
-   	AND DATE(cet_filtrado.created) >= DATE(a.conclusion_date)
+   	AND DATE(cet_filtrado.created) <= DATE(a.conclusion_date)
    	THEN 'Sim'
       ELSE 'Não'
 END AS tem_evento_no_contrato,
@@ -71,4 +71,4 @@ LEFT JOIN authentication_contracts AS ac ON ac.contract_id = c.id
 
 WHERE
     it.id IN (1226, 2168, 1180, 2148)
-    AND DATE(a.conclusion_date) BETWEEN '$data01' AND '$data02'
+    AND DATE(a.conclusion_date) BETWEEN '2026-03-24' AND '2026-03-27'
