@@ -15,7 +15,7 @@ JOIN companies_places AS cp ON cp.id = frt.company_place_id
 JOIN people AS p ON p.id = frt.client_id
 
 WHERE 
-DATE (frto.date) BETWEEN '2025-10-22' AND '2025-10-22'
+DATE (frto.date) BETWEEN '2026-05-01' AND '2026-05-12'
 AND frto.financial_title_occurrence_type_id = 52
 --AND frto.created_by = 39
 --AND fat.title LIKE '%FAT%'
