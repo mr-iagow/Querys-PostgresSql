@@ -47,7 +47,7 @@ LEFT JOIN financial_operations AS fo_contrato ON fo_contrato.id = c.operation_id
 LEFT JOIN financial_operations AS fo_titulo ON fo_titulo.id = fat.financial_operation_id
 LEFT JOIN bank_accounts AS bacc ON fatr.bank_account_id = bacc.id
 
-WHERE fatr.receipt_date BETWEEN '2026-04-01' AND '2026-04-30'
+WHERE fatr.receipt_date BETWEEN '2026-05-01' AND '2026-05-31'
 AND fatr.deleted = FALSE
 AND ( 
 		fat.title LIKE '%FAT%' 
