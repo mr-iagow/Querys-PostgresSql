@@ -20,4 +20,4 @@ LEFT join financial_operations AS fo ON fo.id = inv.financial_operation_id
 
 WHERE 
 
-inv."status" = 3
+inv."status" = 3 
