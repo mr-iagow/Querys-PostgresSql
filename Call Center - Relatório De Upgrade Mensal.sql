@@ -41,4 +41,4 @@ WHERE
 
 
 GROUP BY 1,2,3,4,5,6,7,8,9
-HAVING MAX (pu.final) <='2026-01-01' OR MAX (pu.final) IS NULL
+HAVING MAX (pu.final) <='2026-06-01' OR MAX (pu.final) IS NULL

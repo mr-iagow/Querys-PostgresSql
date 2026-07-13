@@ -21,6 +21,6 @@ left join financial_collection_types AS fct ON c.financial_collection_type_id = 
 LEFT JOIN contract_types AS ct ON ct.id = c.contract_type_id
 
 WHERE 
-DATE (fft.created) BETWEEN '2026-03-01' AND '2026-03-11'
+fft.created BETWEEN '2026-06-16 08:30:00' AND '2026-06-16 13:00:00'
 AND fft.deleted = FALSE 
 AND fft.title LIKE '%FAT%'
