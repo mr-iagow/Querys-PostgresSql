@@ -10,6 +10,7 @@ inv.return_motive AS motivo_rejeicao,
 fo.title AS operacao,
 inv.client_tx_id AS cpf_cnpj
 
+
 FROM invoice_notes AS inv
 LEFT JOIN contracts AS c ON c.id =  inv.contract_id
 LEFT JOIN contract_configuration_billings AS ag ON ag.contract_id = c.id
