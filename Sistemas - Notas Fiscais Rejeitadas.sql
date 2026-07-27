@@ -5,7 +5,7 @@ inv.company_place_name AS empresa,
 inv.client_name AS cliente,
 c.contract_number AS contrato,
 sp.title AS item_nota,
-sp."code" AS codigo_servico_ero,
+sp."code" AS codigo_servico_erro,
 inv.return_motive AS motivo_rejeicao,
 fo.title AS operacao,
 inv.client_tx_id AS cpf_cnpj
