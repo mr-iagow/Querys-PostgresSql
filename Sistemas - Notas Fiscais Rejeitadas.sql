@@ -9,7 +9,10 @@ sp.title AS item_nota,
 sp."code" AS codigo_servico_erro,
 inv.return_motive AS motivo_rejeicao,
 fo.title AS operacao,
-inv.client_tx_id AS cpf_cnpj
+inv.client_tx_id AS cpf_cnpj,
+inv.xml_url,
+inv.xml_dir,
+inv.xml_name
 
 
 FROM invoice_notes AS inv
@@ -24,3 +27,4 @@ LEFT join financial_operations AS fo ON fo.id = inv.financial_operation_id
 WHERE 
 
 inv."status" = 3 
+--AND inv.return_motive = 'E0240 - O CEP informado para o endereço nacional do tomador do serviço não existe ou não pertence ao município do endereço do tomador.'
