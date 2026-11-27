@@ -1,6 +1,9 @@
 SELECT
     ai.protocol                                   AS protocolo,
     cli.name                                      AS cliente,
+    cli.phone 												  AS telefone,
+    cli.cell_phone_1 									  AS celular_1,
+    cli.cell_phone_2 									  AS celular_1,
     it.title                                      AS tipo_solicitacao,
     to_char(a.created, 'DD/MM/YYYY')              AS data_abertura,
     CASE EXTRACT(ISODOW FROM a.created)
@@ -28,6 +31,6 @@ LEFT JOIN contract_types ct           ON ct.id = c.contract_type_id
 LEFT JOIN companies_places cpc        ON cpc.id = c.company_place_id
 LEFT JOIN companies_places cpa        ON cpa.id = a.company_place_id
 WHERE ai.team_id IN (1, 1144, 1148)
-  AND a.created >= DATE '2026-08-18'
-  AND a.created <  DATE '2026-11-18' + INTERVAL '1 day'
+  AND a.created >= DATE '2026-08-26'
+  AND a.created <  DATE '2026-11-26' + INTERVAL '1 day'
 ORDER BY t.title, a.created DESC;
